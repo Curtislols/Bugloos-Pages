@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Witness Statement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ECE9F2; --ink: #2B2340; --muted: #5C5470; --gold: #94722A; --gold-soft: #C9A85C;
+    --panel: #F7F5FA; --rule: #CDBF9B; --btn-ink: #FFFDF6; --choice: #FFFFFF; --choice-hover: #F1ECDD;
+    --glass-1: #FAFBFD; --glass-2: #BFC9D6; --warn: #9A3B3B;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #17112A; --ink: #EDE7F6; --muted: #B4AAC8; --gold: #D9B767; --gold-soft: #8C7236;
+      --panel: #201937; --rule: #5B4B2D; --btn-ink: #1A1430; --choice: #281F42; --choice-hover: #33294F;
+      --glass-1: #3D4260; --glass-2: #1D2035; --warn: #E08A8A;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #17112A; --ink: #EDE7F6; --muted: #B4AAC8; --gold: #D9B767; --gold-soft: #8C7236;
+    --panel: #201937; --rule: #5B4B2D; --btn-ink: #1A1430; --choice: #281F42; --choice-hover: #33294F;
+    --glass-1: #3D4260; --glass-2: #1D2035; --warn: #E08A8A;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IM Fell English", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.1875rem; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 38rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  h1, h2 { font-family: "IM Fell English SC", "IM Fell English", Georgia, serif; font-weight: 400; line-height: 1.2; }
+  h1 { font-size: clamp(2rem, 7vw, 2.75rem); margin: 0 0 0.5rem; text-align: center; }
+  h2 { font-size: 1.5rem; margin: 0 0 1rem; }
+  .sub { text-align: center; font-style: italic; color: var(--muted); margin: 0 0 2rem; }
+  .crest { display: block; width: 6rem; margin: 0 auto 1rem; color: var(--gold); }
+  .scroll {
+    background: var(--panel); border: 1px solid var(--rule); outline: 1px solid var(--rule); outline-offset: 5px;
+    padding: 2rem 1.75rem; margin: 0 6px;
+  }
+  .scroll p { margin: 0 0 1rem; }
+  .oath { list-style: none; padding: 0; margin: 0 0 1.75rem; }
+  .oath li { position: relative; padding-left: 1.6rem; margin-bottom: 0.4rem; }
+  .oath li::before {
+    content: ""; position: absolute; left: 0.2rem; top: 0.72em; width: 0.5rem; height: 0.5rem;
+    background: var(--gold); transform: rotate(45deg);
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .btn {
+    background: var(--gold); color: var(--btn-ink); border: 0; border-radius: 2rem;
+    padding: 0.7rem 1.6rem; font-size: 1.15rem;
+  }
+  .btn:hover { filter: brightness(1.07); }
+  .btn:disabled { opacity: 0.5; cursor: default; filter: none; }
+  .btn:focus-visible, .choice:focus-visible, .reveal:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .center { text-align: center; }
+
+  .bar { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; color: var(--muted); }
+  .clock { font-size: 1.35rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .clock.low { color: var(--warn); }
+  .track { height: 4px; background: var(--rule); margin-bottom: 1.75rem; }
+  .track span { display: block; height: 100%; background: var(--gold); width: 0; transition: width 0.3s; }
+  .prompt { font-size: 1.35rem; line-height: 1.45; margin: 0 0 1.25rem; }
+  .choices { display: grid; gap: 0.6rem; }
+  .choices.grid { grid-template-columns: repeat(auto-fill, minmax(3.5rem, 1fr)); }
+  .choice {
+    text-align: left; background: var(--choice); border: 1px solid var(--rule); border-radius: 0.5rem;
+    padding: 0.75rem 1rem; font-size: 1.15rem;
+  }
+  .choices.grid .choice { text-align: center; padding: 0.75rem 0.25rem; }
+  .choice:hover { background: var(--choice-hover); }
+  .visual { display: flex; justify-content: center; margin: 0 0 1.5rem; color: var(--ink); }
+  .visual svg { max-width: 100%; height: auto; }
+
+  .evidence {
+    border-radius: 50%; aspect-ratio: 5 / 3; max-width: 24rem; margin: 0 auto 1.5rem;
+    background: radial-gradient(ellipse at 35% 28%, var(--glass-1) 0%, var(--glass-2) 80%);
+    box-shadow: 0 0 0 5px var(--gold), 0 0 0 9px var(--panel), 0 0 0 11px var(--gold-soft);
+    display: grid; place-items: center; text-align: center; padding: 1.5rem 2.25rem;
+  }
+  .reveal { background: transparent; border: 1px dashed var(--gold); border-radius: 2rem; padding: 0.5rem 1.2rem; color: var(--gold); }
+  .sealed { color: var(--muted); font-style: italic; }
+  .sentence { font-family: Georgia, "Times New Roman", serif; font-size: 1rem; letter-spacing: 0.03em; line-height: 1.5; }
+  .triangle {
+    width: 11rem; aspect-ratio: 1 / 0.9; background: var(--gold); color: var(--btn-ink);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+    padding-bottom: 0.9rem; font-family: Georgia, serif; font-size: 0.95rem; line-height: 1.25; letter-spacing: 0.04em;
+  }
+
+  .records table { width: 100%; border-collapse: collapse; font-size: 1.05rem; }
+  .records th, .records td { text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--rule); }
+  .records th { font-family: "IM Fell English SC", Georgia, serif; font-weight: 400; color: var(--muted); }
+  .records td.num { font-variant-numeric: tabular-nums; }
+  .table-wrap { overflow-x: auto; }
+  .records { margin-top: 3rem; }
+  .note { color: var(--muted); font-size: 1rem; }
+
+  .name-field { display: grid; gap: 0.4rem; margin: 0 0 1.5rem; }
+  .name-field label { color: var(--muted); }
+  .name-field input { font: inherit; color: var(--ink); background: var(--choice); border: 1px solid var(--rule); border-radius: 0.5rem; padding: 0.6rem 0.9rem; width: 100%; }
+  .name-field input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 30rem) { main { padding: 2rem 1.1rem 3rem; } .scroll { padding: 1.5rem 1.2rem; } }
+</style>
+</head>
+<body>
+<main>
+  <svg class="crest" viewBox="0 0 120 40" aria-hidden="true">
+    <path d="M60 4 L66 16 L78 10 L74 24 L46 24 L42 10 L54 16 Z" fill="currentColor"/>
+    <path d="M8 34 C28 34 36 26 46 28 L74 28 C84 26 92 34 112 34" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="60" cy="4" r="3" fill="currentColor"/><circle cx="42" cy="10" r="2.4" fill="currentColor"/><circle cx="78" cy="10" r="2.4" fill="currentColor"/>
+  </svg>
+  <h1>The Witness Statement</h1>
+  <p class="sub">The Trial of the Magic Mirror, Part 1</p>
+  <div id="app" class="scroll" aria-live="polite"><p class="center sealed">Opening the court records…</p></div>
+</main>
+
+<script>
+(function () {
+  // Paste the Apps Script web app link (ends with /exec) here:
+  var SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
+  var TOTAL = 90;
+  var Q = [
+    { prompt: "Count the letter F in the sentence on the royal scroll. You may read it only once.",
+      flash: { ms: 6000, html: '<div class="sentence">FINISHED FILES ARE THE RESULT OF YEARS OF SCIENTIFIC STUDY COMBINED WITH THE EXPERIENCE OF YEARS.</div>', label: "Unroll the scroll (once)" },
+      options: ["3", "4", "5", "6"], grid: true },
+    { prompt: "Which line is longer?",
+      visual: '<svg viewBox="0 0 320 170" width="320" role="img" aria-label="Two horizontal lines, one with inward arrowheads and one with outward fins"><g stroke="currentColor" stroke-width="5" stroke-linecap="round"><line x1="60" y1="50" x2="260" y2="50"/><line x1="60" y1="50" x2="80" y2="30"/><line x1="60" y1="50" x2="80" y2="70"/><line x1="260" y1="50" x2="240" y2="30"/><line x1="260" y1="50" x2="240" y2="70"/><line x1="60" y1="120" x2="260" y2="120"/><line x1="60" y1="120" x2="40" y2="100"/><line x1="60" y1="120" x2="40" y2="140"/><line x1="260" y1="120" x2="280" y2="100"/><line x1="260" y1="120" x2="280" y2="140"/></g></svg>',
+      options: ["The top line", "The bottom line", "They’re the same length"] },
+    { prompt: "What did the royal sign say?",
+      flash: { ms: 3000, html: '<div class="triangle"><span>PARIS IN</span><span>THE THE</span><span>SPRING</span></div>', label: "Glance at the sign (once)" },
+      options: ["Paris in the spring", "Paris in the the spring", "Paris in spring", "In Paris, the spring"] },
+    { prompt: "The bite in the Apple logo is on which side?",
+      options: ["Left", "Right", "Top", "There’s no bite"] },
+    { prompt: "On a clock face with Roman numerals, how is the number 4 usually written?",
+      options: ["IV", "IIII", "VI", "It’s left blank"] },
+    { prompt: "Is the number 1 in the same place on a phone keypad and a calculator?",
+      options: ["Yes, top-left on both", "No, they’re in different places", "Yes, bottom-left on both"] },
+    { prompt: "How many triangles are actually drawn in this picture?",
+      visual: '<svg viewBox="0 0 320 300" width="300" role="img" aria-label="Three notched circles and three angled corners"><g stroke="currentColor" stroke-width="4" stroke-linecap="round" fill="none"><line x1="160.0" y1="245.0" x2="137.0" y2="205.1"/><line x1="160.0" y1="245.0" x2="183.0" y2="205.1"/><line x1="77.7" y1="102.5" x2="100.8" y2="142.4"/><line x1="77.7" y1="102.5" x2="123.8" y2="102.5"/><line x1="242.3" y1="102.5" x2="219.2" y2="142.4"/><line x1="242.3" y1="102.5" x2="196.2" y2="102.5"/></g><path d="M160.0,55.0 L147.0,77.5 A26,26 0 1 1 173.0,77.5 Z" fill="currentColor"/><path d="M242.3,197.5 L229.3,175.0 A26,26 0 1 1 216.3,197.5 Z" fill="currentColor"/><path d="M77.7,197.5 L103.7,197.5 A26,26 0 1 1 90.7,175.0 Z" fill="currentColor"/></svg>',
+      options: ["0", "1", "2", "3"], grid: true },
+    { prompt: "Which letter in the Google logo is green?",
+      options: ["G", "o", "l", "e"], grid: true }
+  ];
+
+  var app = document.getElementById("app");
+  var answers = [], idx = 0, startAt = 0, tick = null, timedOut = false, submitting = false, witnessName = "";
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function getSaved(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function setSaved(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  function renderIntro() {
+    app.innerHTML = "";
+    app.appendChild(el("h2", null, "🗝️ The oath of the witness"));
+    app.appendChild(el("p", null, "Eight questions. Ninety seconds. Nothing too difficult… apparently."));
+    var ul = el("ul", "oath");
+    ["No Googling, no asking your fellow villagers, and no second opinions.",
+     "Trust your first instinct. You can’t go back.",
+     "Some evidence can be seen only once. Look carefully.",
+     "Keep your answers secret until the royal hearing."].forEach(function (t) { ul.appendChild(el("li", null, t)); });
+    app.appendChild(ul);
+
+    var field = el("div", "name-field");
+    var lab = el("label", null, "Your name, for the court records");
+    lab.setAttribute("for", "witness-name");
+    var input = el("input"); input.id = "witness-name"; input.type = "text"; input.maxLength = 80; input.autocomplete = "name";
+    input.value = getSaved("witness.name") || "";
+    field.appendChild(lab); field.appendChild(input);
+    app.appendChild(field);
+
+    var b = el("button", "btn", "I swear. Start the clock");
+    b.disabled = !input.value.trim();
+    input.addEventListener("input", function () { b.disabled = !input.value.trim(); });
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter" && !b.disabled) b.click(); });
+    b.addEventListener("click", function () {
+      witnessName = input.value.trim();
+      if (!witnessName) return;
+      setSaved("witness.name", witnessName);
+      start();
+    });
+    var c = el("div", "center"); c.appendChild(b); app.appendChild(c);
+  }
+
+  function renderMessage(title, lines) {
+    app.innerHTML = "";
+    app.appendChild(el("h2", "center", title));
+    lines.forEach(function (t) { app.appendChild(el("p", "center", t)); });
+  }
+
+  function start() {
+    answers = Q.map(function () { return null; });
+    idx = 0; timedOut = false; startAt = Date.now();
+    tick = setInterval(updateClock, 250);
+    renderQuestion();
+  }
+
+  function remaining() { return Math.max(0, TOTAL - Math.floor((Date.now() - startAt) / 1000)); }
+
+  function updateClock() {
+    var c = document.getElementById("clock");
+    var r = remaining();
+    if (c) { c.textContent = Math.floor(r / 60) + ":" + String(r % 60).padStart(2, "0"); c.classList.toggle("low", r <= 15); }
+    if (r === 0 && idx < Q.length) { timedOut = true; idx = Q.length; clearInterval(tick); renderConfidence(); }
+  }
+
+  function renderQuestion() {
+    if (idx >= Q.length) { clearInterval(tick); renderConfidence(); return; }
+    var q = Q[idx];
+    app.innerHTML = "";
+    var bar = el("div", "bar");
+    bar.appendChild(el("span", null, "Question " + (idx + 1) + " of " + Q.length));
+    var clock = el("span", "clock"); clock.id = "clock"; bar.appendChild(clock);
+    app.appendChild(bar);
+    var track = el("div", "track"); var fill = el("span"); fill.style.width = (idx / Q.length * 100) + "%"; track.appendChild(fill); app.appendChild(track);
+    updateClock();
+
+    app.appendChild(el("p", "prompt", q.prompt));
+    if (q.visual) { var vis = el("div", "visual"); vis.innerHTML = q.visual; app.appendChild(vis); }
+
+    var choices = el("div", "choices" + (q.grid ? " grid" : ""));
+    q.options.forEach(function (opt) {
+      var b = el("button", "choice", opt);
+      b.addEventListener("click", function () { answers[idx] = opt; idx++; renderQuestion(); });
+      choices.appendChild(b);
+    });
+
+    if (q.flash) {
+      var ev = el("div", "evidence");
+      var rb = el("button", "reveal", q.flash.label);
+      choices.hidden = true;
+      rb.addEventListener("click", function () {
+        ev.innerHTML = q.flash.html;
+        setTimeout(function () {
+          ev.innerHTML = "";
+          ev.appendChild(el("span", "sealed", "The evidence has been sealed."));
+          choices.hidden = false;
+          var first = choices.querySelector("button"); if (first) first.focus();
+        }, q.flash.ms);
+      });
+      ev.appendChild(rb);
+      app.appendChild(ev);
+    }
+    app.appendChild(choices);
+  }
+
+  function renderConfidence() {
+    app.innerHTML = "";
+    if (timedOut) app.appendChild(el("p", "center sealed", "Time’s up. The court has stopped the clock."));
+    app.appendChild(el("h2", null, "One last question for the court"));
+    app.appendChild(el("p", "prompt", "How many of the 8 do you think you got right?"));
+    var choices = el("div", "choices grid");
+    for (var n = 0; n <= 8; n++) {
+      (function (n) {
+        var b = el("button", "choice", String(n));
+        b.addEventListener("click", function () { submit(n); });
+        choices.appendChild(b);
+      })(n);
+    }
+    app.appendChild(choices);
+  }
+
+  function submit(predicted) {
+    if (submitting) return;
+    submitting = true;
+    var seconds = Math.min(TOTAL, Math.round((Date.now() - startAt) / 1000));
+    var record = { name: witnessName, answers: answers, predicted: predicted, seconds: seconds, timedOut: timedOut };
+    renderMessage("Sealing your statement…", []);
+    fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(record) })
+      .then(function () {
+        setSaved("witness.sealed", "1");
+        renderMessage("🪞 Your statement has been sealed", [
+          "The mirror has your answers. Nobody else can see them.",
+          "Results, and the truth, will be revealed at the royal hearing.",
+          "Until then, keep your eyes open."
+        ]);
+      })
+      .catch(function () {
+        submitting = false;
+        renderMessage("The court couldn’t record your statement", ["Check your connection and try once more. Your answers are still here."]);
+        var b = el("button", "btn", "Submit again"); b.addEventListener("click", function () { submit(predicted); });
+        var c = el("div", "center"); c.appendChild(b); app.appendChild(c);
+      });
+  }
+
+  if (getSaved("witness.sealed")) {
+    renderMessage("🪞 Your statement is already sealed", [
+      "Each witness may testify only once.",
+      "The truth will be revealed at the royal hearing."
+    ]);
+  } else {
+    renderIntro();
+  }
+})();
+</script>
+</body>
+</html>
